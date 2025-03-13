@@ -1,5 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
-import DataDriveUI from '../pages/dataDriveUI'
+
+import DataDriveUIRedux from '../pages/dataDriveUI/redux'
+import DataDriveUIUseContext from '../pages/dataDriveUI/useContext'
+import DataDriveUIRxReact from '../pages/dataDriveUI/rxReact'
 import VideoTrack from '../pages/videoTrack'
 
 const rootPath = ''
@@ -7,8 +10,22 @@ const rootPath = ''
 export default function Content() {
   return (
     <Routes>
-      <Route path="*" element={<DataDriveUI />} />
-      <Route path={`${rootPath}/data_drive_ui`} element={<DataDriveUI />} />
+      <Route
+        path={`${rootPath}/data_drive_ui`}
+        element={<DataDriveUIRxReact />}
+      />
+      <Route
+        path={`${rootPath}/data_drive_ui/useContext`}
+        element={<DataDriveUIUseContext />}
+      />
+      <Route
+        path={`${rootPath}/data_drive_ui/redux`}
+        element={<DataDriveUIRedux />}
+      />
+      <Route
+        path={`${rootPath}/data_drive_ui/rx+react`}
+        element={<DataDriveUIRxReact />}
+      />
       <Route path={`${rootPath}/video_track`} element={<VideoTrack />} />
     </Routes>
   )

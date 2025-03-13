@@ -3,3 +3,7 @@
   height: 1200px;
   background-color: aqua;
 }
+.title {
+  font-size: 30px;
+  font-weight: 600;
+}

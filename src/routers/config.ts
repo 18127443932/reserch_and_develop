@@ -7,6 +7,9 @@ export interface MenuItemConfig {
   disabled?: boolean
   type?: 'group'
   children?: MenuItemConfig[]
+  routeInfo?: {
+    path: string
+  }
 }
 
 export const routerConfig: MenuItemConfig[] = [
@@ -20,8 +23,9 @@ export const routerConfig: MenuItemConfig[] = [
         title: 'data_drive_ui',
         type: 'group',
         children: [
-          { key: '0_0_0', title: '未优化' },
-          { key: '0_0_1', title: 'rx+react' },
+          { key: '0_0_0', title: 'useContext', routeInfo: { path: "data_drive_ui/useContext"} },
+          { key: '0_0_1', title: 'redux', routeInfo: { path: "data_drive_ui/redux"} },
+          { key: '0_0_2', title: 'rx+react', routeInfo: { path: "data_drive_ui/rx+react"} },
         ],
       },
     ],
