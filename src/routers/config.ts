@@ -23,21 +23,40 @@ export const routerConfig: MenuItemConfig[] = [
         title: 'data_drive_ui',
         type: 'group',
         children: [
-          { key: '0_0_0', title: 'useContext', routeInfo: { path: "data_drive_ui/useContext"} },
-          { key: '0_0_1', title: 'redux', routeInfo: { path: "data_drive_ui/redux"} },
-          { key: '0_0_2', title: 'rx+react', routeInfo: { path: "data_drive_ui/rx+react"} },
+          {
+            key: '0_0_0',
+            title: 'useContext',
+            routeInfo: { path: 'data_drive_ui/useContext' },
+          },
+          {
+            key: '0_0_1',
+            title: 'redux',
+            routeInfo: { path: 'data_drive_ui/redux' },
+          },
+          {
+            key: '0_0_2',
+            title: 'rx_react',
+            routeInfo: { path: 'data_drive_ui/rx_react' },
+          },
         ],
       },
     ],
   },
   {
     key: '1',
-    title: 'Navigation 2',
+    title: 'Video Track',
     icon: IconBug,
     children: [
-      { key: '1_0', title: 'Menu 1' },
-      { key: '1_1', title: 'Menu 2' },
-      { key: '1_2', title: 'Menu 3' },
+      {
+        key: '1_0',
+        title: 'DrawFrame',
+        routeInfo: { path: 'video_track/draw_frame' },
+      },
+      {
+        key: '1_1',
+        title: 'BaseRealize',
+        routeInfo: { path: 'video_track/base_realize' },
+      },
     ],
   },
   {
