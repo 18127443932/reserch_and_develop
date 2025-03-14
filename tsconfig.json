@@ -8,9 +8,5 @@
     "target": "ES6", // 或更高版本
     "experimentalDecorators": true, // 启用装饰器
     "emitDecoratorMetadata": true, // 可选：如果需要元数据反射
-    "baseUrl": "./src",
-    "paths": {
-      "@pages/*": ["pages/*"]
-    }
   }
 }

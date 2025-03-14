@@ -11,15 +11,19 @@
   },
   "dependencies": {
     "@arco-design/web-react": "^2.65.0",
+    "@types/react-redux": "^7.1.34",
     "arco.css": "link:@arco-design/web-react/dist/arco.css",
     "mac-scrollbar": "^0.13.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.3.0",
+    "redux": "^5.0.1",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
@@ -34,7 +38,7 @@
     "globals": "^15.15.0",
     "less": "^4.2.2",
     "prettier": "^3.5.3",
-    "typescript": "~5.7.2",
+    "typescript": "~5.7.3",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.2.0"
   }

@@ -2,7 +2,8 @@ import style from './index.module.less'
 import { model } from '../../store'
 import useSubject from '../../../../../utils/hooks/useSubject'
 import { useRerenderRef } from '../../../../../utils/hooks/useRerenderRef'
-export default function A1() {
+
+export function A1() {
   const ref = useRerenderRef()
   const name = useSubject(model.userInfo.name)
   const age = useSubject(model.userInfo.age)
@@ -17,3 +18,5 @@ export default function A1() {
     </div>
   )
 }
+
+export default A1

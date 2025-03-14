@@ -2,7 +2,7 @@ import style from './index.module.less'
 import { model } from '../../store'
 import { Button } from '@arco-design/web-react'
 import useSubject from '../../../../../utils/hooks/useSubject'
-import { useRerenderRef } from '../../../../../utils/hooks/useRerenderRef'
+import { useRerenderRef } from 'utils/hooks/useRerenderRef'
 
 export default function B1() {
   const ref = useRerenderRef()

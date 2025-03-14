@@ -1,7 +1,8 @@
 import style from './index.module.less'
 import A_1 from '../A_1'
 import { useRerenderRef } from '../../../../../utils/hooks/useRerenderRef'
-export default function A() {
+
+export function A() {
   const ref = useRerenderRef()
   return (
     <div className={style.main} ref={ref.updater}>
@@ -10,3 +11,5 @@ export default function A() {
     </div>
   )
 }
+
+export default A

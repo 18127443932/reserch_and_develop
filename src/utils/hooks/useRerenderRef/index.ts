@@ -9,7 +9,7 @@ import { NodeRef } from '../useNodeRef/useNodeRef'
  * @returns
  */
 export function useRerenderRef(
-  startStyle: React.CSSProperties = { background: 'white' },
+  startStyle: React.CSSProperties = { background: 'pink' },
   endStyle: React.CSSProperties = {},
   duration: number = 100
 ): NodeRef {

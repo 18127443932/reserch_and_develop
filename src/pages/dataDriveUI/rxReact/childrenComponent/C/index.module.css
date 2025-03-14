@@ -1,5 +1,13 @@
 .container {
-  width: 100%;
-  border: 2px solid #0008ff;
-  box-sizing: border-box;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+.container h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 16px;
+  font-weight: 600;
 }

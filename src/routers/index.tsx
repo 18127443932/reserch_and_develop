@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 
-import DataDriveUIRedux from '../pages/dataDriveUI/redux'
-import DataDriveUIUseContext from '../pages/dataDriveUI/useContext'
-import DataDriveUIRxReact from '../pages/dataDriveUI/rxReact'
+import DataDriveUIRedux from '../pages/dataDriveUI/Redux'
+import DataDriveUIUseContext from '../pages/dataDriveUI/UseContext'
+import DataDriveUIRxReact from '../pages/dataDriveUI/RxReact'
 import VideoTrack from '../pages/videoTrack'
 
 const rootPath = ''
