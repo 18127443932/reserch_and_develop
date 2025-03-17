@@ -1,3 +1,4 @@
+import { Slider, Button } from '@arco-design/web-react'
 import {
   useEffect,
   useState,
@@ -7,20 +8,15 @@ import {
   useImperativeHandle,
   ForwardedRef,
 } from 'react'
-import { Slider, Button } from '@arco-design/web-react'
+import styles from './index.module.less'
 
 const url =
   'https://w3c.github.io/webcodecs/samples/data/bbb_video_avc_frag.mp4'
 const dpi = window.devicePixelRatio || 1
 
-const frameStore = new Map<number, ImageBitmap>()
-
-const blockWidth = 60
-const blockHeight = 60
-const lineSpace = 20
-
 interface TrackProps {
   url: string
+  blockHeight: number
   onLoaded?: () => void
 }
 
@@ -40,39 +36,39 @@ export default function BaseRealize() {
   const [canShowTrack, setCanShowTrack] = useState(false)
   const handleDraw = useCallback(() => {
     trackRef.current?.draw()
-  }, [trackRef])
-  const handleScaleChange = useCallback(
-    (val: number | number[]) => {
-      if (typeof val === 'number') {
-        trackRef.current?.scale(val)
-      }
-    },
-    [trackRef]
-  )
+  }, [])
+  const handleScaleChange = useCallback((val: number | number[]) => {
+    if (typeof val === 'number') {
+      trackRef.current?.scale(val)
+    }
+  }, [])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h1 style={{ fontSize: 20 }}>视频轨道（无虚拟滚动优化）</h1>
-      <div>
-        <Button disabled={!canShowTrack} onClick={handleDraw}>
-          显示轨道
-        </Button>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontSize: 14 }}>调整缩放: </span>
+    <div className={styles.container}>
+      <h1 className={styles.title}>视频轨道（无虚拟滚动优化）</h1>
+      <div className={styles.controls}>
+        <div className={styles.buttonGroup}>
+          <Button type="primary" disabled={!canShowTrack} onClick={handleDraw}>
+            显示轨道
+          </Button>
+        </div>
+        <div className={styles.sliderGroup}>
+          <span className={styles.label}>调整缩放(毫秒/帧):</span>
           <Slider
             disabled={!canShowTrack}
-            style={{ width: 200 }}
-            defaultValue={1}
-            min={1}
-            max={1000}
+            defaultValue={1000}
+            min={100}
+            max={10000}
+            step={100}
             onChange={handleScaleChange}
           />
         </div>
       </div>
-      <div style={{ overflow: 'scroll', width: 1000 }}>
+      <div className={styles.content}>
         <Track
           url={url}
           ref={trackRef}
+          blockHeight={60}
           onLoaded={() => {
             setCanShowTrack(true)
           }}
@@ -86,28 +82,23 @@ const Track = forwardRef(function Track(
   props: TrackProps,
   ref: ForwardedRef<TrackRef>
 ) {
-  const { url, onLoaded } = props
+  const { url, blockHeight, onLoaded } = props
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const videoWidthRef = useRef<number>(0)
-  const videoHeightRef = useRef<number>(0)
-  const imageBlockSegmentsRef = useRef<[number, ImageBlockSegment[]] | []>([])
-  const currentDrawBeginAt = useRef<number>(0)
-  const unitTimeRef = useRef<number>(1000)
-  const durationRef = useRef<number>(0)
+  const unitTimeRef = useRef<number>(1000) // 毫秒/帧
+  const durationRef = useRef<number>(0) // 视频总时长，单位: ms
+
+  const blockWidth = useRef<number>(0) // 绘制帧块的宽度， 宽度根据视频宽高计算
+  const lineSpace = 20 // 顶部文字的行间距
+
+  const frameStore = useRef<Map<number, ImageBitmap>>(
+    new Map<number, ImageBitmap>()
+  )
 
   useImperativeHandle(ref, () => ({
     scale(rate: number) {
-      unitTimeRef.current = Math.floor((1 / rate) * 1000)
-      if (!canvasRef.current) return
-      canvasRef.current.width =
-        (durationRef.current / unitTimeRef.current) * dpi
-      canvasRef.current.height = (lineSpace + blockHeight) * dpi
-      canvasRef.current.style.width =
-        durationRef.current / unitTimeRef.current + 'px'
-      canvasRef.current.style.height = lineSpace + blockHeight + 'px'
-      const ctx = canvasRef.current.getContext('2d')
-      ctx?.scale(dpi, dpi)
+      unitTimeRef.current = rate
+      config()
       draw()
     },
     draw,
@@ -116,12 +107,9 @@ const Track = forwardRef(function Track(
   useEffect(() => {
     if (url) {
       init()
+      config()
     }
   }, [url])
-
-  function blockTime(): number {
-    return unitTimeRef.current * blockWidth
-  }
 
   function init() {
     videoRef.current = document.createElement('video')
@@ -133,208 +121,121 @@ const Track = forwardRef(function Track(
 
   function handleVideoLoadeddata() {
     onLoaded?.()
-    if (!videoRef.current) return
-    const { videoWidth, videoHeight, duration } = videoRef.current
-
-    const durationMS = duration * 1000
-    videoWidthRef.current = videoWidth
-    videoHeightRef.current = videoHeight
-    durationRef.current = durationMS
-    if (!canvasRef.current) return
-    canvasRef.current.width = (durationMS / unitTimeRef.current) * dpi
-    canvasRef.current.height = (lineSpace + blockHeight) * dpi
-    canvasRef.current.style.width = durationMS / unitTimeRef.current + 'px'
-    canvasRef.current.style.height = lineSpace + blockHeight + 'px'
-    const ctx = canvasRef.current.getContext('2d')
-    if (ctx) {
-      ctx.scale(dpi, dpi)
-    }
+    config()
   }
 
-  function calcImgBlocks(): ImageBlockSegment[] {
-    const blockTimeVal = blockTime()
+  // 进行相关配置
+  const config = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) {
+      console.error('videoRef.current or canvasRef.current is null')
+      return
+    }
+    const { videoWidth, videoHeight, duration } = videoRef.current
+    const durationMS = duration * 1000
+    blockWidth.current = (videoWidth / videoHeight) * blockHeight
+    durationRef.current = durationMS
+    // 计算出 canvas 绘图尺寸及样式尺寸
+    canvasRef.current.width =
+      (durationMS / unitTimeRef.current) * blockWidth.current * dpi
+    canvasRef.current.height = (lineSpace + blockHeight) * dpi
+    canvasRef.current.style.width =
+      (durationMS / unitTimeRef.current) * blockWidth.current + 'px'
+    canvasRef.current.style.height = lineSpace + blockHeight + 'px'
+    const ctx = canvasRef.current.getContext('2d')
+    ctx?.scale(dpi, dpi)
+  }, [dpi, blockHeight])
 
+  // 获取需要绘制的块信息
+  const getImgBlocks = useCallback((): ImageBlockSegment[] => {
     const imgBlockSegments = new Array(
-      Math.ceil(durationRef.current / blockTimeVal)
+      Math.ceil(durationRef.current / unitTimeRef.current)
     )
       .fill(true)
       .map((v, index, arr) => ({
         id: index,
-        startTime: index * blockTimeVal,
+        startTime: index * unitTimeRef.current,
         endTime: arr[index + 1]
-          ? (index + 1) * blockTimeVal
+          ? (index + 1) * unitTimeRef.current
           : durationRef.current,
       }))
-    console.log('imgBlockSegments', imgBlockSegments)
 
     return imgBlockSegments
-  }
+  }, [])
 
-  async function drawBlock(id: number, currentSeg: ImageBlockSegment) {
-    const timeAt = currentSeg.startTime
-    const videoWidth = videoWidthRef.current
-    const videoHeight = videoHeightRef.current
-    const blockTimeVal = blockTime()
-
-    if (id < currentDrawBeginAt.current) return
-
-    if (!canvasRef.current || !videoRef.current) return
-    const ctx = canvasRef.current.getContext('2d')
-    if (!ctx) return
-
-    let source: ImageBitmap
-
-    const exist = frameStore.get(timeAt)
-
-    if (!exist) {
-      console.log(timeAt / 1000, 'timeAt / 1000')
-      videoRef.current.currentTime = timeAt / 1000
+  // 获取位图资源信息
+  const getResource = useCallback(
+    async (currentSeg: ImageBlockSegment): Promise<ImageBitmap> => {
+      const startTime = currentSeg.startTime
+      const cache = frameStore.current.get(startTime)
+      if (cache) return cache
+      if (!videoRef.current) {
+        throw new Error('videoRef.current is null')
+      }
+      videoRef.current.currentTime = startTime / 1000
       await new Promise((resolve) => {
         if (!videoRef.current) return
         videoRef.current.onseeked = () => {
           resolve('draw_track_seek_done')
         }
       })
-      if (id < currentDrawBeginAt.current) return
 
-      const bm = await createImageBitmap(
+      const source = await createImageBitmap(
         videoRef.current,
         0,
         0,
-        videoWidth,
-        videoHeight
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight
       )
-      if (id < currentDrawBeginAt.current) return
 
-      frameStore.set(timeAt, bm)
-      source = bm
-    } else {
-      source = exist
-    }
+      frameStore.current.set(startTime, source)
+      return source
+    },
+    []
+  )
 
-    let sourceX = 0
-    let sourceY = 0
-    let sourceWidth = 0
-    let sourceHeight = 0
-    if (videoWidth / videoHeight > blockWidth / blockHeight) {
-      sourceX = (videoWidth - videoHeight) / 2
-      sourceY = 0
-      sourceWidth =
-        videoHeight *
-        ((currentSeg.endTime - currentSeg.startTime) / blockTimeVal)
-      sourceHeight = videoHeight
-    } else {
-      sourceX = 0
-      sourceY = (videoHeight - videoWidth) / 2
-      sourceWidth =
-        videoWidth *
-        ((currentSeg.endTime - currentSeg.startTime) / blockTimeVal)
-      sourceHeight = videoWidth
-    }
-    const imgX = currentSeg.startTime / unitTimeRef.current
-    const imgY = lineSpace
-    const imgWidth =
-      (currentSeg.endTime - currentSeg.startTime) / unitTimeRef.current
-    const imgHeight = blockHeight
+  const drawBlock = useCallback(
+    async (currentSeg: ImageBlockSegment) => {
+      const ctx = canvasRef?.current?.getContext('2d')
+      if (!canvasRef.current || !videoRef.current || !ctx) return
 
-    console.log(
-      source,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      imgX,
-      imgY,
-      imgWidth,
-      imgHeight,
-      'image'
-    )
+      const source: ImageBitmap = await getResource(currentSeg)
+      const imgX =
+        (currentSeg.startTime / unitTimeRef.current) * blockWidth.current
+      const imgY = lineSpace
+      const imgWidth = blockWidth.current
+      const imgHeight = blockHeight
 
-    ctx.drawImage(
-      source,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      imgX,
-      imgY,
-      imgWidth,
-      imgHeight
-    )
-    ctx.strokeStyle = '#f00'
-    ctx.fillStyle = '#f00'
-    ctx.font = '12px serif'
-
-    ctx.strokeRect(imgX, imgY, imgWidth, imgHeight)
-    ctx.fillText(`${currentSeg.startTime}`, imgX, imgY)
-  }
-
-  function drawBackground(id: number, start: number, end: number) {
-    if (id < currentDrawBeginAt.current) return
-
-    if (!canvasRef.current) return
-    const ctx = canvasRef.current.getContext('2d')
-    if (!ctx) return
-
-    ctx.save()
-
-    const imgX = start / unitTimeRef.current
-    const imgY = lineSpace
-    const imgWidth = (end - start) / unitTimeRef.current
-    const imgHeight = blockHeight
-
-    ctx.fillStyle = '#000'
-
-    ctx.fillRect(imgX, imgY, imgWidth, imgHeight)
-    ctx.restore()
-  }
-
-  async function draw() {
-    currentDrawBeginAt.current = currentDrawBeginAt.current + 1
-    const closureTime = currentDrawBeginAt.current
-    if (!canvasRef.current) return
-    const ctx = canvasRef.current.getContext('2d')
-    if (!ctx) return
-
-    ctx.clearRect(
-      0,
-      0,
-      durationRef.current / unitTimeRef.current,
-      lineSpace + blockHeight
-    )
-
-    let imageBlockSegments: ImageBlockSegment[]
-    if (imageBlockSegmentsRef.current[0] === unitTimeRef.current) {
-      const [, segments] = imageBlockSegmentsRef.current
-      if (!segments) {
-        imageBlockSegments = calcImgBlocks()
-        imageBlockSegmentsRef.current = [
-          unitTimeRef.current,
-          imageBlockSegments,
-        ]
-      } else {
-        imageBlockSegments = segments
-      }
-    } else {
-      imageBlockSegments = calcImgBlocks()
-      imageBlockSegmentsRef.current = [unitTimeRef.current, imageBlockSegments]
-    }
-
-    console.log(imageBlockSegments, 'imageBlockSegments')
-
-    for (let i = 0; i < imageBlockSegments.length; i++) {
-      drawBackground(
-        closureTime,
-        imageBlockSegments[i].startTime,
-        imageBlockSegments[i].endTime
+      ctx.drawImage(
+        source,
+        0,
+        0,
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight,
+        imgX,
+        imgY,
+        imgWidth,
+        imgHeight
       )
-    }
+      ctx.strokeStyle = '#f00'
+      ctx.fillStyle = '#f00'
+      ctx.font = '12px serif'
 
+      ctx.strokeRect(imgX, imgY, imgWidth, imgHeight)
+      ctx.fillText(`${currentSeg.startTime}`, imgX, imgY)
+    },
+    [blockWidth]
+  )
+
+  const draw = useCallback(async () => {
+    const ctx = canvasRef.current?.getContext('2d')
+    const imageBlockSegments: ImageBlockSegment[] = getImgBlocks()
+    if (!canvasRef.current || !ctx) return
+
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     for (let i = 0; i < imageBlockSegments.length; i++) {
-      await drawBlock(closureTime, imageBlockSegments[i])
-      if (closureTime < currentDrawBeginAt.current) return
+      await drawBlock(imageBlockSegments[i])
     }
-  }
+  }, [])
 
   return <canvas ref={canvasRef} />
 })

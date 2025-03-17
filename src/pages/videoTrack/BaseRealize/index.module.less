@@ -1,0 +1,85 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 24px;
+  background: #fff;
+  border-radius: 12px;
+
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d2129;
+    margin: 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #e5e6eb;
+
+    .buttonGroup {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      :global(.arco-btn) {
+        min-width: 100px;
+        height: 36px;
+        font-weight: 500;
+      }
+    }
+
+    .sliderGroup {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+
+      .label {
+        font-size: 14px;
+        color: #4e5969;
+        min-width: 120px;
+      }
+
+      :global(.arco-slider) {
+        flex: 1;
+        max-width: 300px;
+      }
+    }
+  }
+
+  .content {
+    overflow: auto;
+    border-radius: 8px;
+    border: 1px solid #e5e6eb;
+    background: #f7f8fa;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f2f5;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c9cdd4;
+      border-radius: 4px;
+      
+      &:hover {
+        background: #a9aeb8;
+      }
+    }
+
+    canvas {
+      display: block;
+    }
+  }
+}
