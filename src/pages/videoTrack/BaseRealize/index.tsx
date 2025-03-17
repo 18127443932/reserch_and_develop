@@ -57,7 +57,7 @@ export default function BaseRealize() {
           <Slider
             disabled={!canShowTrack}
             defaultValue={1000}
-            min={100}
+            min={10}
             max={10000}
             step={100}
             onChange={handleScaleChange}
@@ -85,7 +85,7 @@ const Track = forwardRef(function Track(
   const { url, blockHeight, onLoaded } = props
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const unitTimeRef = useRef<number>(1000) // 毫秒/帧
+  const fameDuration = useRef<number>(1000) // 毫秒/帧
   const durationRef = useRef<number>(0) // 视频总时长，单位: ms
 
   const blockWidth = useRef<number>(0) // 绘制帧块的宽度， 宽度根据视频宽高计算
@@ -97,7 +97,7 @@ const Track = forwardRef(function Track(
 
   useImperativeHandle(ref, () => ({
     scale(rate: number) {
-      unitTimeRef.current = rate
+      fameDuration.current = rate
       config()
       draw()
     },
@@ -136,10 +136,10 @@ const Track = forwardRef(function Track(
     durationRef.current = durationMS
     // 计算出 canvas 绘图尺寸及样式尺寸
     canvasRef.current.width =
-      (durationMS / unitTimeRef.current) * blockWidth.current * dpi
+      (durationMS / fameDuration.current) * blockWidth.current * dpi
     canvasRef.current.height = (lineSpace + blockHeight) * dpi
     canvasRef.current.style.width =
-      (durationMS / unitTimeRef.current) * blockWidth.current + 'px'
+      (durationMS / fameDuration.current) * blockWidth.current + 'px'
     canvasRef.current.style.height = lineSpace + blockHeight + 'px'
     const ctx = canvasRef.current.getContext('2d')
     ctx?.scale(dpi, dpi)
@@ -148,14 +148,14 @@ const Track = forwardRef(function Track(
   // 获取需要绘制的块信息
   const getImgBlocks = useCallback((): ImageBlockSegment[] => {
     const imgBlockSegments = new Array(
-      Math.ceil(durationRef.current / unitTimeRef.current)
+      Math.ceil(durationRef.current / fameDuration.current)
     )
       .fill(true)
       .map((v, index, arr) => ({
         id: index,
-        startTime: index * unitTimeRef.current,
+        startTime: index * fameDuration.current,
         endTime: arr[index + 1]
-          ? (index + 1) * unitTimeRef.current
+          ? (index + 1) * fameDuration.current
           : durationRef.current,
       }))
 
@@ -200,7 +200,7 @@ const Track = forwardRef(function Track(
 
       const source: ImageBitmap = await getResource(currentSeg)
       const imgX =
-        (currentSeg.startTime / unitTimeRef.current) * blockWidth.current
+        (currentSeg.startTime / fameDuration.current) * blockWidth.current
       const imgY = lineSpace
       const imgWidth = blockWidth.current
       const imgHeight = blockHeight

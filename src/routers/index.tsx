@@ -6,7 +6,8 @@ import DataDriveUIRxReact from '../pages/dataDriveUI/RxReact'
 import VideoTrack from '../pages/videoTrack'
 import VideoTrackDrawFrame from '../pages/videoTrack/DrawFrame'
 import VideoTrackBaseRealize from '../pages/videoTrack/BaseRealize'
-
+import VideoTrackMultiBaseRealize from '../pages/videoTrack/MultiBaseRealize'
+import VideoTrackSingleBaseRealize from '../pages/videoTrack/SingleBaseRealize'
 const rootPath = ''
 
 export default function Content() {
@@ -36,6 +37,14 @@ export default function Content() {
       <Route
         path={`${rootPath}/video_track/base_realize`}
         element={<VideoTrackBaseRealize />}
+      />
+      <Route
+        path={`${rootPath}/video_track/multi_base_realize`}
+        element={<VideoTrackMultiBaseRealize />}
+      />
+      <Route
+        path={`${rootPath}/video_track/single_base_realize`}
+        element={<VideoTrackSingleBaseRealize />}
       />
     </Routes>
   )

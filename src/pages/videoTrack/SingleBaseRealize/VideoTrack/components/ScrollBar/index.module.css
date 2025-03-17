@@ -1,0 +1,22 @@
+.container:hover .scrollBarX,
+.container:hover .scrollBarY {
+  opacity: 1;
+}
+.scrollBarX,
+.scrollBarY {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  transition: opacity 0.2s linear;
+  opacity: 0;
+}
+.scrollBarX {
+  bottom: 0;
+  left: 0;
+  height: 8px;
+}
+.scrollBarY {
+  top: 0;
+  left: 0;
+  width: 8;
+}

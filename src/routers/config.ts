@@ -57,6 +57,16 @@ export const routerConfig: MenuItemConfig[] = [
         title: 'BaseRealize',
         routeInfo: { path: 'video_track/base_realize' },
       },
+      {
+        key: '1_2',
+        title: 'MultiBaseRealize',
+        routeInfo: { path: 'video_track/multi_base_realize' },
+      },
+      {
+        key: '1_3',
+        title: 'SingleBaseRealize',
+        routeInfo: { path: 'video_track/single_base_realize' },
+      },
     ],
   },
   {
