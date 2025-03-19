@@ -31,8 +31,8 @@ const ScrollBar = forwardRef(function (props: ScrollBarProps, ref) {
   const [scrollXVal, setScrollXVal] = useState(0)
   const [scrollYVal, setScrollYVal] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
-  const lastContetWidthRef = useRef(contentWidth)
-  const lastContetHeightRef = useRef(contentHeight)
+  const lastContentWidthRef = useRef(contentWidth)
+  const lastContentHeightRef = useRef(contentHeight)
   useEffect(() => {
     containerRef.current?.addEventListener('wheel', handleWheel)
     return () => {
@@ -57,40 +57,41 @@ const ScrollBar = forwardRef(function (props: ScrollBarProps, ref) {
     let nextScrollYVal = scrollYVal
     if (!disabled) {
       if (scrollX) {
-        if (!lastContetWidthRef.current) {
-          lastContetWidthRef.current = contentWidth
-        } else if (lastContetWidthRef.current !== contentWidth) {
-          const lastScrollRatio = scrollXVal / lastContetWidthRef.current
+        if (!lastContentWidthRef.current) {
+          lastContentWidthRef.current = contentWidth
+        } else if (lastContentWidthRef.current !== contentWidth) {
+          const lastScrollRatio = scrollXVal / lastContentWidthRef.current
           const viewRatio = Math.min(width / contentWidth, 1)
           // 滚动比例不能大于1 - viewRatio
           nextScrollXVal =
             Math.min(1 - viewRatio, lastScrollRatio) * contentWidth
           setScrollXVal(nextScrollXVal)
-          lastContetWidthRef.current = contentWidth
+          lastContentWidthRef.current = contentWidth
         }
       }
       if (scrollY) {
-        if (!lastContetHeightRef.current) {
-          lastContetHeightRef.current = contentHeight
-        } else if (lastContetHeightRef.current !== contentHeight) {
-          const lastScrollRatio = scrollYVal / lastContetHeightRef.current
+        if (!lastContentHeightRef.current) {
+          lastContentHeightRef.current = contentHeight
+        } else if (lastContentHeightRef.current !== contentHeight) {
+          const lastScrollRatio = scrollYVal / lastContentHeightRef.current
           const viewRatio = Math.min(height / contentHeight, 1)
           // 滚动比例不能大于1 - viewRatio
           nextScrollYVal =
             Math.min(1 - viewRatio, lastScrollRatio) * contentHeight
           setScrollYVal(nextScrollYVal)
-          lastContetHeightRef.current = contentHeight
+          lastContentHeightRef.current = contentHeight
         }
       }
-      ;(nextScrollXVal !== scrollXVal || nextScrollYVal !== scrollYVal) &&
+      if (nextScrollXVal !== scrollXVal || nextScrollYVal !== scrollYVal) {
         onScroll?.(nextScrollXVal, nextScrollYVal)
+      }
     }
   }, [contentWidth, contentHeight])
 
   useEffect(() => {
     if (contentWidth && contentHeight) {
-      lastContetWidthRef.current = contentWidth
-      lastContetHeightRef.current = contentHeight
+      lastContentWidthRef.current = contentWidth
+      lastContentHeightRef.current = contentHeight
       setScrollXVal(0)
       onScroll?.(0, scrollYVal)
     }

@@ -5,14 +5,12 @@
   min-height: 100vh;
   background: #fafafa;
 }
-
 .title {
   margin-bottom: 24px;
   color: #1f2329;
   font-size: 24px;
   font-weight: 500;
 }
-
 .controls {
   margin-bottom: 24px;
   background: #fff;
@@ -20,19 +18,16 @@
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-
 .sliderGroup {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
 .label {
   min-width: 120px;
   color: #4e5969;
   font-size: 14px;
 }
-
 .content {
   display: flex;
   flex-direction: column;
@@ -42,7 +37,6 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
-
 .videoTrackContainer {
   width: 800px;
   background: #fff;
